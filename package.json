@@ -2,14 +2,16 @@
   "name": "slrepsms-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.ts",
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "typeorm": "typeorm-ts-node-esm"
-
+    "typeorm": "typeorm-ts-node-esm",
+    "migration:generate": "typeorm-ts-node-esm migration:generate -d ./src/config/data-source.ts",
+    "migration:run": "typeorm-ts-node-esm migration:run -d ./src/config/data-source.ts",
+    "migration:revert": "typeorm-ts-node-esm migration:revert -d ./src/config/data-source.ts"
   },
   "repository": {
     "type": "git",
@@ -27,9 +29,12 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.0.2",
     "pg": "^8.16.3",
+    "pino": "^10.1.1",
+    "pino-http": "^11.0.0",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.28",
     "zod": "^4.3.5"
@@ -38,10 +43,11 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/helmet": "^0.0.48",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^25.0.6",
-    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }
