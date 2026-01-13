@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { registerUser, login, refresh } from "../services/auth.service.js";
+import { registerUser, login, refresh , logoutUser} from "../services/auth.service.js";
 
 export async function register(req: Request, res: Response) {
   const dto = z.object({
@@ -24,6 +24,14 @@ export async function loginCtrl(req: Request, res: Response) {
 
   res.json(await login(dto.email, dto.password));
 }
+
+export async function logoutCtrl(req: Request, res: Response) {
+  const dto = z.object({ refreshToken: z.string().min(10) }).parse(req.body);
+
+  await logoutUser(dto.refreshToken); // revoke the token
+  res.json({ message: "Logged out successfully" });
+}
+
 
 export async function refreshCtrl(req: Request, res: Response) {
   const dto = z.object({ refreshToken: z.string().min(10) }).parse(req.body);
