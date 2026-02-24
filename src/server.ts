@@ -7,7 +7,7 @@ async function bootstrap() {
   await AppDataSource.initialize();
   console.log("✅ DB connected");
 
-  app.listen(env.PORT, () =>
+  app.listen(env.PORT,"0.0.0.0", () =>
     console.log(`✅ API running http://localhost:${env.PORT}`)
   );
 }

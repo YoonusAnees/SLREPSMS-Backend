@@ -1,0 +1,64 @@
+import  AppDataSource  from "../config/data-source.js";
+import { Driver, LicenseStatus } from "../entities/Driver.js";
+import  {User}  from "../entities/User.js";
+
+export async function getMyDriverProfile(userId: string) {
+  const repo = AppDataSource.getRepository(Driver);
+  const driver = await repo
+    .createQueryBuilder("d")
+    .leftJoinAndSelect("d.user", "u")
+    .where("u.id = :userId", { userId })
+    .getOne();
+
+  if (!driver) throw Object.assign(new Error("Driver profile not found"), { status: 404 });
+  return driver;
+}
+
+export async function upsertMyDriverProfile(userId: string, dto: { licenseNo: string; initialPoints?: number }) {
+  return AppDataSource.transaction(async (trx) => {
+    const uRepo = trx.getRepository(User);
+    const dRepo = trx.getRepository(Driver);
+
+    const user = await uRepo.findOne({ where: { id: userId } });
+    if (!user) throw Object.assign(new Error("User not found"), { status: 404 });
+    if (user.role !== "DRIVER") throw Object.assign(new Error("Only DRIVER can create driver profile"), { status: 403 });
+
+    let driver = await dRepo
+      .createQueryBuilder("d")
+      .leftJoinAndSelect("d.user", "u")
+      .where("u.id = :userId", { userId })
+      .getOne();
+
+    if (!driver) {
+      driver = dRepo.create({
+        user,
+        licenseNo: dto.licenseNo,
+        currentPoints: dto.initialPoints ?? 5,
+        licenseStatus: LicenseStatus.ACTIVE,
+        suspendedUntil: null
+      });
+    } else {
+      driver.licenseNo = dto.licenseNo;
+      if (typeof dto.initialPoints === "number") driver.currentPoints = dto.initialPoints;
+    }
+
+    return dRepo.save(driver);
+  });
+}
+
+
+export async function updateMyProfile(
+  userId: string,
+  dto: { name?: string; phone?: string; nic?: string }
+) {
+  const repo = AppDataSource.getRepository(User);
+
+  const user = await repo.findOne({ where: { id: userId } });
+  if (!user) throw Object.assign(new Error("User not found"), { status: 404 });
+
+  if (dto.name !== undefined) user.name = dto.name;
+  if (dto.phone !== undefined) user.phone = dto.phone;
+  if (dto.nic !== undefined) user.nic = dto.nic;
+
+  return repo.save(user);
+}
