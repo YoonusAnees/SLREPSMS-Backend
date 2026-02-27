@@ -14,8 +14,8 @@ export function signRefreshToken(sub: string, role: string) {
 export function verifyAccessToken(token: string): JwtPayload {
   const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayload;
 
-  console.log("✅ DECODED:", decoded);
-  console.log("✅ ROLE:", decoded.role);
+  // console.log("✅ DECODED:", decoded);
+  // console.log("✅ ROLE:", decoded.role);
 
   return decoded;
 }
