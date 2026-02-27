@@ -4,6 +4,8 @@ import { env } from "./env.js";
 import { User } from "../entities/User.js";
 import { RefreshToken } from "../entities/RefreshToken.js";
 import { Driver } from "../entities/Driver.js";
+import { ViolationType } from "../entities/ViolationType.js";
+import { Penalty } from "../entities/Penalty.js";
 
 const AppDataSource = new DataSource({
   type: "postgres",
@@ -12,7 +14,7 @@ const AppDataSource = new DataSource({
   username: env.DB_USER,
   password: env.DB_PASS,
   database: env.DB_NAME,
-  entities: [User, RefreshToken ,Driver],
+  entities: [User, RefreshToken ,Driver, ViolationType, Penalty],
   migrations: ["src/db/migrations/*.ts"],
   synchronize: false,
   logging: false,
