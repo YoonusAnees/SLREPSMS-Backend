@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index } from "typeorm";
 import { User } from "./User.js";
 import { ViolationType } from "./ViolationType.js";
+import { Vehicle } from "./Vehicle.js";
 
 export type PenaltyStatus = "UNPAID" | "PAID" | "CANCELLED";
 
@@ -9,13 +10,18 @@ export class Penalty {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
+  @ManyToOne(() => Vehicle, { onDelete: "RESTRICT" })
+  @JoinColumn({ name: "vehicle_id" })
+  vehicle!: Vehicle;
+
+  // keep driverUser for history/audit (optional but recommended)
   @ManyToOne(() => User, { onDelete: "RESTRICT" })
   @JoinColumn({ name: "driver_user_id" })
   driverUser!: User;
 
   @ManyToOne(() => User, { onDelete: "RESTRICT" })
   @JoinColumn({ name: "issued_by_user_id" })
-  issuedBy!: User; // officer
+  issuedBy!: User;
 
   @ManyToOne(() => ViolationType, { onDelete: "RESTRICT" })
   @JoinColumn({ name: "violation_type_id" })
