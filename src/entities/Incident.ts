@@ -44,8 +44,7 @@ export class Incident {
     spatialFeatureType: "Point",
     srid: 4326,
   })
-  location!: string; // POINT(lng lat)
-
+baseLocation!: { type: "Point"; coordinates: [number, number] };
   @Column({ name: "location_text", type: "varchar", length: 200, nullable: true })
   locationText?: string | null;
 

@@ -1,6 +1,6 @@
 import AppDataSource from "../config/data-source.js";
 import { RescueTeam } from "../entities/RescueTeam.js";
-import { pointWkt } from "../utils/geo.js";
+import { pointGeoJSON } from "../utils/geo.js";
 
 export async function getMyRescueTeam(userId: string) {
   return AppDataSource.getRepository(RescueTeam).findOne({
@@ -30,7 +30,7 @@ export async function updateMyRescueTeam(userId: string, dto: {
     if (dto.phone !== undefined) team.phone = dto.phone ?? null;
 
     if (dto.baseLat !== undefined && dto.baseLng !== undefined) {
-      team.baseLocation = pointWkt(dto.baseLng, dto.baseLat);
+      team.baseLocation = pointGeoJSON(dto.baseLng, dto.baseLat);
     }
 
     if (dto.baseLocationText !== undefined) {

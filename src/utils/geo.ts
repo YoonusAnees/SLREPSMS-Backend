@@ -1,4 +1,3 @@
-export function pointWkt(lng: number, lat: number) {
-  // PostGIS expects POINT(lng lat)
-  return `POINT(${lng} ${lat})`;
+export function pointGeoJSON(lng: number, lat: number): { type: "Point"; coordinates: [number, number] } {
+  return { type: "Point", coordinates: [lng, lat] };
 }

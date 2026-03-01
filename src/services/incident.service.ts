@@ -1,7 +1,7 @@
 import  AppDataSource  from "../config/data-source.js";
 import { Incident } from "../entities/Incident.js";
 import { User } from "../entities/User.js";
-import { pointWkt } from "../utils/geo.js";
+import { pointGeoJSON } from "../utils/geo.js";
 
 export async function createIncident(userId: string, dto: {
   type: "ACCIDENT" | "BREAKDOWN" | "MEDICAL" | "FIRE" | "OTHER";
@@ -25,7 +25,7 @@ export async function createIncident(userId: string, dto: {
       status: "NEW",
       description: dto.description ?? null,
       locationText: dto.locationText ?? null,
-      location: pointWkt(dto.lng, dto.lat),
+      baseLocation:pointGeoJSON(dto.lng, dto.lat),
     });
 
     return iRepo.save(incident);

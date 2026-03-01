@@ -43,7 +43,7 @@ export class RescueTeam {
     spatialFeatureType: "Point",
     srid: 4326,
   })
-  baseLocation!: string; // POINT(lng lat)
+baseLocation!: { type: "Point"; coordinates: [number, number] };
 
   @Column({ name: "base_location_text", type: "varchar", length: 200, nullable: true })
   baseLocationText?: string;

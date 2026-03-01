@@ -1,8 +1,9 @@
 import AppDataSource from "../config/data-source.js";
 import { User } from "../entities/User.js";
 import { RescueTeam } from "../entities/RescueTeam.js";
-import { pointWkt } from "../utils/geo.js";
+import { pointGeoJSON } from "../utils/geo.js";
 import bcrypt from "bcryptjs";
+import type { DeepPartial } from "typeorm";
 
 export async function registerRescue(dto: {
   name: string;
@@ -31,21 +32,22 @@ export async function registerRescue(dto: {
       email: dto.email,
       passwordHash,
       role: "RESCUE",
-      phone: dto.phone ?? undefined, // ✅
+      phone: dto.phone ?? undefined,
     });
 
     const savedUser = await uRepo.save(user);
 
-    const rescue = rtRepo.create({
-      user: savedUser, // ✅ now exists
+    const rescuePayload: DeepPartial<RescueTeam> = {
+      user: savedUser,
       teamCode: dto.teamCode,
       name: dto.name,
-      phone: dto.phone ?? undefined, // ✅
+      phone: dto.phone ?? undefined,
       status: "AVAILABLE",
-      baseLocation: pointWkt(dto.baseLng, dto.baseLat),
-      baseLocationText: dto.baseLocationText ?? undefined, // ✅
-    });
+      baseLocation: pointGeoJSON(dto.baseLng, dto.baseLat),
+      baseLocationText: dto.baseLocationText ?? undefined,
+    };
 
+    const rescue = rtRepo.create(rescuePayload);
     const savedRescue = await rtRepo.save(rescue);
 
     return {
