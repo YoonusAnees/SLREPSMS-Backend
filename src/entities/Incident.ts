@@ -1,0 +1,58 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  OneToMany,
+  Index,
+} from "typeorm";
+
+import { User } from "./User.js";
+import type { Dispatch } from "./Dispatch.js";
+
+export type IncidentStatus = "NEW" | "DISPATCHED" | "RESOLVED" | "CANCELLED";
+export type IncidentType = "ACCIDENT" | "BREAKDOWN" | "MEDICAL" | "FIRE" | "OTHER";
+export type IncidentSeverity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+
+@Entity("incidents")
+export class Incident {
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
+
+  @ManyToOne(() => User, { onDelete: "RESTRICT" })
+  @JoinColumn({ name: "reported_by_user_id" })
+  reportedBy!: User;
+
+  @Column({ name: "type", type: "varchar", length: 20 })
+  type!: IncidentType;
+
+  @Column({ name: "severity", type: "varchar", length: 20 })
+  severity!: IncidentSeverity;
+
+  @Column({ name: "status", type: "varchar", length: 20, default: "NEW" })
+  status!: IncidentStatus;
+
+  @Column({ name: "description", type: "text", nullable: true })
+  description?: string | null;
+
+  @Index({ spatial: true })
+  @Column({
+    name: "location",
+    type: "geography",
+    spatialFeatureType: "Point",
+    srid: 4326,
+  })
+  location!: string; // POINT(lng lat)
+
+  @Column({ name: "location_text", type: "varchar", length: 200, nullable: true })
+  locationText?: string | null;
+
+  @CreateDateColumn({ name: "created_at", type: "timestamptz" })
+  createdAt!: Date;
+
+  // ✅ string relation target avoids importing Dispatch runtime
+  @OneToMany("Dispatch", "incident")
+  dispatches!: Dispatch[];
+}
