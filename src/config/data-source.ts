@@ -8,6 +8,9 @@ import { ViolationType } from "../entities/ViolationType.js";
 import { Penalty } from "../entities/Penalty.js";
 import { Vehicle } from "../entities/Vehicle.js";
 import { Payment } from "../entities/Payment.js";
+import { Incident } from "../entities/Incident.js";
+import { RescueTeam } from "../entities/RescueTeam.js";
+import { Dispatch } from "../entities/Dispatch.js";
 
 const AppDataSource = new DataSource({
   type: "postgres",
@@ -16,7 +19,7 @@ const AppDataSource = new DataSource({
   username: env.DB_USER,
   password: env.DB_PASS,
   database: env.DB_NAME,
-  entities: [User, RefreshToken ,Driver, ViolationType, Penalty,Vehicle,Payment],
+  entities: [User, RefreshToken ,Driver, ViolationType, Penalty,Vehicle,Payment,Incident,RescueTeam,Dispatch],
   migrations: ["src/db/migrations/*.ts"],
   synchronize: false,
   logging: false,
