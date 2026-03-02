@@ -51,6 +51,13 @@ export class Payment {
   @Column({ name: "idempotency_key", type: "varchar", length: 80 })
   idempotencyKey!: string;
 
+  // ✅ ADD THESE (Stripe demo fields)
+  @Column({ name: "stripe_payment_intent_id", type: "varchar", length: 80, nullable: true })
+  stripePaymentIntentId?: string | null;
+
+  @Column({ name: "stripe_client_secret", type: "varchar", length: 255, nullable: true })
+  stripeClientSecret?: string | null;
+
   @CreateDateColumn({ name: "paid_at", type: "timestamptz" })
   paidAt!: Date;
 }
