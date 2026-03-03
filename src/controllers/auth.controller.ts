@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { registerUser, login, refresh , logoutUser} from "../services/auth.service.js";
+import { registerUser, login, refresh , logoutUser, bulkRegisterUsers} from "../services/auth.service.js";
 
 export async function register(req: Request, res: Response) {
   const dto = z.object({
@@ -14,6 +14,27 @@ export async function register(req: Request, res: Response) {
 
   const u = await registerUser(dto);
   res.json({ id: u.id, email: u.email, role: u.role });
+}
+
+export async function bulkRegister(req: Request, res: Response) {
+  const dto = z.array(
+    z.object({
+      name: z.string().min(2),
+      email: z.string().email(),
+      role: z.enum(["DRIVER", "OFFICER", "ADMIN", "DISPATCHER", "RESCUE"]),
+      password: z.string().min(8),
+      phone: z.string().optional(),
+      nic: z.string().optional(),
+    })
+  ).parse(req.body);
+
+  const users = await bulkRegisterUsers(dto);
+
+  res.json({
+    message: "Users created successfully",
+    count: users.length,
+    data: users,
+  });
 }
 
 export async function loginCtrl(req: Request, res: Response) {

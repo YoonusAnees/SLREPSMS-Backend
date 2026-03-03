@@ -1,6 +1,7 @@
 import  AppDataSource  from "../config/data-source.js";
 import { Driver, LicenseStatus } from "../entities/Driver.js";
 import  {User}  from "../entities/User.js";
+import { Vehicle } from "../entities/Vehicle.js";
 
 export async function getMyDriverProfile(userId: string) {
   const repo = AppDataSource.getRepository(Driver);
@@ -61,4 +62,60 @@ export async function updateMyProfile(
   if (dto.nic !== undefined) user.nic = dto.nic;
 
   return repo.save(user);
+}
+
+
+
+export async function getDriverByLicenseNo(licenseNo: string) {
+  const lic = licenseNo.trim();
+
+  const dRepo = AppDataSource.getRepository(Driver);
+  const vRepo = AppDataSource.getRepository(Vehicle);
+
+  const driver = await dRepo
+    .createQueryBuilder("d")
+    .leftJoinAndSelect("d.user", "u")
+    .where("d.license_no = :lic", { lic }) // ✅ IMPORTANT: DB column is license_no
+    .getOne();
+
+  if (!driver) {
+    throw Object.assign(new Error("Driver not found for given licenseNo"), { status: 404 });
+  }
+
+  const vehicles = await vRepo.find({
+    where: { driver: { id: driver.id } } as any,
+    order: { createdAt: "DESC" } as any,
+  });
+
+  // ✅ Return a nice payload for officer UI
+  return {
+    driver: {
+      id: driver.id,
+      licenseNo: driver.licenseNo,
+      currentPoints: driver.currentPoints,
+      licenseStatus: driver.licenseStatus,
+      suspendedUntil: driver.suspendedUntil,
+    },
+    user: {
+      id: driver.user.id,
+      name: driver.user.name,
+      email: driver.user.email,
+      phone: driver.user.phone ?? null,
+      nic: driver.user.nic ?? null,
+      role: driver.user.role,
+      createdAt: driver.user.createdAt,
+    },
+    vehicles: vehicles.map((v) => ({
+      id: v.id,
+      plateNo: v.plateNo,
+      type: v.type,
+      model: v.model ?? null,
+      color: v.color ?? null,
+      year: v.year ?? null,
+      insuranceExpiry: v.insuranceExpiry ?? null,
+      ownershipVerified: v.ownershipVerified,
+      createdAt: v.createdAt,
+      updatedAt: v.updatedAt,
+    })),
+  };
 }

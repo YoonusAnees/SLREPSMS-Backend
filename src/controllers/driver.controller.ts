@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { getMyDriverProfile, upsertMyDriverProfile, updateMyProfile } from "../services/driver.service.js";
+import { getMyDriverProfile, upsertMyDriverProfile, updateMyProfile, getDriverByLicenseNo } from "../services/driver.service.js";
 
 export async function getMe(req: Request, res: Response) {
   const userId = (req as any).user.sub;
@@ -28,4 +28,13 @@ export async function updateMeDriver(req: Request, res: Response) {
   }).parse(req.body);
 
   res.json(await updateMyProfile(userId, dto));
+}
+
+
+
+
+
+export async function getByLicenseNo(req: Request, res: Response) {
+  const licenseNo = z.string().min(5).max(30).parse(req.params.licenseNo);
+  res.json(await getDriverByLicenseNo(licenseNo));
 }

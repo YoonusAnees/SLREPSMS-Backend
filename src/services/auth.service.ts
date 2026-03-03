@@ -28,6 +28,47 @@ export async function registerUser(payload: {
   return u;
 }
 
+export async function bulkRegisterUsers(items: {
+  name: string;
+  email: string;
+  role: any;
+  password: string;
+  phone?: string;
+  nic?: string;
+}[]) {
+  const repo = AppDataSource.getRepository(User);
+
+  const usersToSave: User[] = [];
+
+  for (const item of items) {
+    const exists = await repo.findOne({ where: { email: item.email } });
+    if (exists) {
+      throw Object.assign(
+        new Error(`Email already exists: ${item.email}`),
+        { status: 409 }
+      );
+    }
+
+    const passwordHash = await hashPassword(item.password);
+
+    const user = repo.create({
+      name: item.name,
+      email: item.email,
+      role: item.role,
+      passwordHash,
+      phone: item.phone,
+      nic: item.nic,
+    });
+
+    usersToSave.push(user);
+  }
+
+  await repo.save(usersToSave);
+
+  return usersToSave;
+}
+
+
 export async function login(email: string, password: string) {
   const repo = AppDataSource.getRepository(User);
   const rtRepo = AppDataSource.getRepository(RefreshToken);
