@@ -123,6 +123,7 @@ export async function confirmStripeDemo(driverUserId: string, dto: { paymentId: 
     }
 
     payment.status = "SUCCESS";
+    payment.paidAt = new Date();
     await payRepo.save(payment);
 
     if (payment.penalty.status !== "PAID") {
@@ -137,7 +138,14 @@ export async function confirmStripeDemo(driverUserId: string, dto: { paymentId: 
 export async function myPayments(driverUserId: string) {
   return AppDataSource.getRepository(Payment).find({
     where: { paidBy: { id: driverUserId } } as any,
-    relations: { penalty: { violationType: true, vehicle: true } } as any,
+    relations: {
+      penalty: {
+        violationType: true,
+        vehicle: true,
+        issuedBy: true,     // ✅ officer details
+        driverUser: true,   // optional (audit/history)
+      },
+    } as any,
     order: { paidAt: "DESC" } as any,
   });
 }

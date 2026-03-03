@@ -7,6 +7,7 @@ import {
   JoinColumn,
   Index,
   CreateDateColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { Penalty } from "./Penalty.js";
 import { User } from "./User.js";
@@ -26,6 +27,10 @@ export class Payment {
   @ManyToOne(() => User, { onDelete: "RESTRICT" })
   @JoinColumn({ name: "paid_by_user_id" })
   paidBy!: User;
+
+  @ManyToOne(() => User, { onDelete: "RESTRICT" })
+  @JoinColumn({ name: "issued_by_user_id" })
+  issuedBy!: User;
 
   @Index({ unique: true })
   @Column({ name: "receipt_no", type: "varchar", length: 40 })
@@ -58,6 +63,12 @@ export class Payment {
   @Column({ name: "stripe_client_secret", type: "varchar", length: 255, nullable: true })
   stripeClientSecret?: string | null;
 
-  @CreateDateColumn({ name: "paid_at", type: "timestamptz" })
-  paidAt!: Date;
+@CreateDateColumn({ name: "created_at", type: "timestamptz" })
+createdAt!: Date;
+
+@Column({ name: "paid_at", type: "timestamptz", nullable: true })
+paidAt?: Date | null;
+
+@UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
+updatedAt!: Date;
 }
