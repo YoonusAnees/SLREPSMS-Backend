@@ -7,7 +7,7 @@ const r = Router();
 r.get("/me", auth, rbac(["DRIVER"]), getMe);
 r.post("/me", auth, rbac(["DRIVER"]), upsertMe);
 r.put("/me/update", auth, rbac(["DRIVER"]), updateMeDriver);
-r.get("/by-license/:licenseNo", auth, rbac(["OFFICER", "ADMIN"]), getByLicenseNo);
+r.get("/by-license/:licenseNo", auth, rbac(["DRIVER", "OFFICER", "ADMIN"]), getByLicenseNo);
 
 
 export default r;
