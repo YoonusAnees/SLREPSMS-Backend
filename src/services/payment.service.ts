@@ -136,16 +136,32 @@ export async function confirmStripeDemo(driverUserId: string, dto: { paymentId: 
 }
 
 export async function myPayments(driverUserId: string) {
-  return AppDataSource.getRepository(Payment).find({
+  const payments = await AppDataSource.getRepository(Payment).find({
     where: { paidBy: { id: driverUserId } } as any,
     relations: {
       penalty: {
         violationType: true,
         vehicle: true,
-        issuedBy: true,     // ✅ officer details
-        driverUser: true,   // optional (audit/history)
+        driverUser: true,
+        issuedBy: true,
       },
     } as any,
     order: { paidAt: "DESC" } as any,
   });
+
+  return payments.map((p) => ({
+    id: p.id,
+    receiptNo: p.receiptNo,
+    amountLkr: p.amountLkr,
+    status: p.status,
+    paidAt: p.paidAt,
+    updatedAt: p.updatedAt,
+
+    officerName:
+      p.penalty?.issuedBy?.name ||
+      p.penalty?.issuedBy?.email,
+
+    violationCode: p.penalty?.violationType?.code,
+    vehiclePlate: p.penalty?.vehicle?.plateNo,
+  }));
 }
