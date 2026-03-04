@@ -8,6 +8,7 @@ import paymentsRoutes from "./payments.routes.js";
 import incidentsRoutes from "./incidents.routes.js";
 import dispatchRoutes from "./dispatch.routes.js";
 import rescueRoutes from "./rescue.routes.js";
+import adminRoutes from "./admin.routes.js";
 
 
 export const routes = Router();
@@ -21,4 +22,5 @@ routes.use("/payments", paymentsRoutes);
 routes.use("/incidents", incidentsRoutes);
 routes.use("/dispatch", dispatchRoutes);
 routes.use("/rescue", rescueRoutes);
+routes.use("/admin", adminRoutes);
 
