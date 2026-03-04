@@ -10,6 +10,7 @@ export async function createIncident(userId: string, dto: {
   lng: number;
   description?: string;
   locationText?: string;
+  evidence?: string;
 }) {
   return AppDataSource.transaction(async (trx) => {
     const uRepo = trx.getRepository(User);
@@ -25,6 +26,7 @@ export async function createIncident(userId: string, dto: {
       status: "NEW",
       description: dto.description ?? null,
       locationText: dto.locationText ?? null,
+      evidence: dto.evidence ?? null,
       baseLocation:pointGeoJSON(dto.lng, dto.lat),
     });
 

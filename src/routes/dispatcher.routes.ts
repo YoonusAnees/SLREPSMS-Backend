@@ -5,8 +5,8 @@ import { nearest, dispatch, updateStatus } from "../controllers/dispatch.control
 
 const r = Router();
 
-r.post("/nearest", auth, rbac(["OFFICER", "ADMIN"]), nearest);
-r.post("/", auth, rbac(["OFFICER", "ADMIN"]), dispatch);
-r.patch("/status", auth, rbac(["OFFICER", "ADMIN"]), updateStatus);
+r.post("/nearest", auth, rbac(["OFFICER", "ADMIN","DRIVER"]), nearest);
+r.post("/", auth, rbac(["OFFICER", "ADMIN","DRIVER"]), dispatch);
+r.patch("/status", auth, rbac(["OFFICER", "ADMIN","DRIVER"]), updateStatus);
 
 export default r;

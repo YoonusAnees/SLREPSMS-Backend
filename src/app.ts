@@ -13,7 +13,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
-
+app.use("/uploads", express.static("uploads"));
 app.use("/api", routes);
 
 app.use(errorHandler);

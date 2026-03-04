@@ -48,6 +48,11 @@ baseLocation!: { type: "Point"; coordinates: [number, number] };
   @Column({ name: "location_text", type: "varchar", length: 200, nullable: true })
   locationText?: string | null;
 
+@Column({ name: "evidence", type: "varchar", length: 500, nullable: true })
+evidence?: string | null;
+
+
+
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 

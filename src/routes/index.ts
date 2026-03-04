@@ -5,8 +5,8 @@ import violationTypesRoutes from "./violationTypes.routes.js";
 import penaltiesRoutes from "./penalties.routes.js";
 import vehiclesRoutes from "./vehicles.routes.js";
 import paymentsRoutes from "./payments.routes.js";
-import incidentsRoutes from "./incidents.routes.js";
-import dispatchRoutes from "./dispatch.routes.js";
+import dispatcherRoutes from "./dispatcher.routes.js";
+import incidentsRoutes from "./incident.routes.js";
 import rescueRoutes from "./rescue.routes.js";
 import adminRoutes from "./admin.routes.js";
 
@@ -20,7 +20,7 @@ routes.use("/penalties", penaltiesRoutes);
 routes.use("/vehicles", vehiclesRoutes);
 routes.use("/payments", paymentsRoutes);
 routes.use("/incidents", incidentsRoutes);
-routes.use("/dispatch", dispatchRoutes);
+routes.use("/dispatch", dispatcherRoutes);
 routes.use("/rescue", rescueRoutes);
 routes.use("/admin", adminRoutes);
 
