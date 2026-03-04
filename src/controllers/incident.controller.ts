@@ -12,7 +12,7 @@ export async function create(req: Request, res: Response) {
     lng: z.number(),
     description: z.string().optional(),
     locationText: z.string().optional(),
-    evidence: z.string().optional(),
+    evidence: z.string().optional(), 
   }).parse(req.body);
 
   res.json(await createIncident(userId, dto));

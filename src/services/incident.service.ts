@@ -8,9 +8,9 @@ export async function createIncident(userId: string, dto: {
   severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   lat: number;
   lng: number;
-  description?: string;
-  locationText?: string;
-  evidence?: string;
+  description?: string | null;
+  locationText?: string | null;
+  evidence?: string | null;
 }) {
   return AppDataSource.transaction(async (trx) => {
     const uRepo = trx.getRepository(User);
