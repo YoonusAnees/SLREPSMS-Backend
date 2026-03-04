@@ -35,8 +35,24 @@ export async function createIncident(userId: string, dto: {
 }
 
 export async function listIncidents() {
-  return AppDataSource.getRepository(Incident).find({
-    relations: { reportedBy: true, dispatches: true },
-    order: { createdAt: "DESC" },
+  const repo = AppDataSource.getRepository(Incident);
+
+  const { raw, entities } = await repo
+    .createQueryBuilder("i")
+    .leftJoinAndSelect("i.reportedBy", "reportedBy")
+    .leftJoinAndSelect("i.dispatches", "dispatches")
+    .addSelect(`ST_AsGeoJSON(i.location)`, "location_geojson")
+    .orderBy("i.createdAt", "DESC")
+    .getRawAndEntities();
+
+  return entities.map((e, idx) => {
+    const geo = raw[idx]?.location_geojson
+      ? JSON.parse(raw[idx].location_geojson)
+      : null;
+
+    return {
+      ...e,
+      location: geo, // { type:"Point", coordinates:[lng,lat] }
+    };
   });
 }
