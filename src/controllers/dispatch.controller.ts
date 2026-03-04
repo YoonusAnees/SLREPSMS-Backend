@@ -1,6 +1,12 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { dispatchTeam, nearestTeams, updateDispatchStatus } from "../services/dispatch.service.js";
+import {
+  dispatchTeam,
+  nearestTeams,
+  updateDispatchStatus,
+  listDispatches,
+  dispatchStats,
+} from "../services/dispatch.service.js";
 
 export async function nearest(req: Request, res: Response) {
   const dto = z.object({
@@ -32,4 +38,17 @@ export async function updateStatus(req: Request, res: Response) {
   }).parse(req.body);
 
   res.json(await updateDispatchStatus(dto));
+}
+
+export async function myDispatches(req: Request, res: Response) {
+  const userId = (req as any).user.sub;
+  res.json(await listDispatches({ dispatchedByUserId: userId }));
+}
+
+export async function allDispatches(req: Request, res: Response) {
+  res.json(await listDispatches({}));
+}
+
+export async function stats(req: Request, res: Response) {
+  res.json(await dispatchStats());
 }

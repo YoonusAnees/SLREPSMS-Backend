@@ -45,8 +45,8 @@ export async function dispatchTeam(
     const dRepo = trx.getRepository(Dispatch);
 
     const dispatcher = await uRepo.findOne({ where: { id: dispatcherUserId } });
-    if (!dispatcher || (dispatcher.role !== "ADMIN" && dispatcher.role !== "OFFICER")) {
-      throw Object.assign(new Error("Only ADMIN/OFFICER can dispatch"), { status: 403 });
+    if (!dispatcher || (dispatcher.role !== "ADMIN" && dispatcher.role !== "OFFICER" && dispatcher.role !== "DISPATCHER")) {
+      throw Object.assign(new Error("Only ADMIN/OFFICER/DISPATCHER can dispatch"), { status: 403 });
     }
 
     const incident = await iRepo.findOne({ where: { id: dto.incidentId } });
@@ -121,4 +121,49 @@ export async function updateDispatchStatus(dto: {
       relations: { incident: true, rescueTeam: true },
     });
   });
+}
+
+export async function listDispatches(opts: { dispatchedByUserId?: string }) {
+  const repo = AppDataSource.getRepository(Dispatch);
+
+  const qb = repo
+    .createQueryBuilder("d")
+    .leftJoinAndSelect("d.incident", "incident")
+    .leftJoinAndSelect("d.rescueTeam", "rescueTeam")
+    .leftJoinAndSelect("d.dispatchedBy", "dispatchedBy")
+    .orderBy("d.createdAt", "DESC");
+
+  if (opts.dispatchedByUserId) {
+    qb.where("dispatchedBy.id = :id", { id: opts.dispatchedByUserId });
+  }
+
+  return qb.getMany();
+}
+
+export async function dispatchStats() {
+  // simple counts for dashboard cards
+  const iRepo = AppDataSource.getRepository(Incident);
+  const dRepo = AppDataSource.getRepository(Dispatch);
+
+  const [newIncidents, dispatchedIncidents, resolvedIncidents, cancelledIncidents] =
+    await Promise.all([
+      iRepo.count({ where: { status: "NEW" } }),
+      iRepo.count({ where: { status: "DISPATCHED" } }),
+      iRepo.count({ where: { status: "RESOLVED" } }),
+      iRepo.count({ where: { status: "CANCELLED" } }),
+    ]);
+
+  const activeDispatches = await dRepo.count({
+    where: [{ status: "ASSIGNED" }, { status: "EN_ROUTE" }, { status: "ON_SCENE" }],
+  });
+
+  return {
+    incidents: {
+      NEW: newIncidents,
+      DISPATCHED: dispatchedIncidents,
+      RESOLVED: resolvedIncidents,
+      CANCELLED: cancelledIncidents,
+    },
+    activeDispatches,
+  };
 }

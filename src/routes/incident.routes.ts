@@ -39,6 +39,6 @@ r.post(
 /* ------------------------------
    LIST INCIDENTS
 --------------------------------*/
-r.get("/", auth, rbac(["OFFICER", "ADMIN"]), list);
+r.get("/", auth, rbac(["OFFICER", "ADMIN", "DISPATCHER"]), list);
 
 export default r;
