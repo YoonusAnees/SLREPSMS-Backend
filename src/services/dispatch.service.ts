@@ -167,3 +167,16 @@ export async function dispatchStats() {
     activeDispatches,
   };
 }
+
+export async function listDispatchesForRescue(userId: string) {
+  return AppDataSource.getRepository(Dispatch)
+    .createQueryBuilder("d")
+    .leftJoinAndSelect("d.incident", "incident")
+    .leftJoinAndSelect("d.rescueTeam", "rescueTeam")
+    .leftJoinAndSelect("d.dispatchedBy", "dispatchedBy")
+    .leftJoin("d.rescueTeam", "rt")
+    .leftJoin("rt.user", "u")
+    .where("u.id = :userId", { userId })
+    .orderBy("d.createdAt", "DESC")
+    .getMany();
+}

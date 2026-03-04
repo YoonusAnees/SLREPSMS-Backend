@@ -1,3 +1,4 @@
+// src/controllers/rescue-auth.controller.ts
 import { Request, Response } from "express";
 import { z } from "zod";
 import { registerRescue } from "../services/rescue-auth.service.js";

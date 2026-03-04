@@ -6,6 +6,7 @@ import {
   updateDispatchStatus,
   listDispatches,
   dispatchStats,
+  listDispatchesForRescue,
 } from "../services/dispatch.service.js";
 
 export async function nearest(req: Request, res: Response) {
@@ -51,4 +52,10 @@ export async function allDispatches(req: Request, res: Response) {
 
 export async function stats(req: Request, res: Response) {
   res.json(await dispatchStats());
+}
+
+
+export async function rescueMyDispatches(req: Request, res: Response) {
+  const userId = (req as any).user.sub;
+  res.json(await listDispatchesForRescue(userId));
 }
