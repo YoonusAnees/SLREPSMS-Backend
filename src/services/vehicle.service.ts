@@ -1,4 +1,4 @@
-import  AppDataSource  from "../config/data-source.js";
+import AppDataSource from "../config/data-source.js";
 import { Vehicle } from "../entities/Vehicle.js";
 import { Driver } from "../entities/Driver.js";
 import { normalizePlate } from "../utils/normalizePlate.js";
@@ -12,7 +12,7 @@ export async function addVehicle(
     model?: string;
     color?: string;
     year?: number;
-    insuranceExpiry?: string; // YYYY-MM-DD
+    insuranceExpiry?: string;
   }
 ) {
   return AppDataSource.transaction(async (trx) => {
@@ -61,7 +61,6 @@ export async function listMyVehicles(userId: string) {
     .getMany();
 }
 
-
 export async function verifyVehicleOwnership(
   verifierUserId: string,
   plateNo: string
@@ -87,12 +86,51 @@ export async function verifyVehicleOwnership(
       throw Object.assign(new Error("Vehicle not found"), { status: 404 });
     }
 
-    if (vehicle.ownershipVerified) {
-      return vehicle; // already verified (safe idempotent behavior)
-    }
+    if (vehicle.ownershipVerified) return vehicle;
 
     vehicle.ownershipVerified = true;
-
     return vRepo.save(vehicle);
   });
+}
+
+export async function getVehicleByPlateNo(plateNo: string) {
+  const plateNorm = normalizePlate(plateNo);
+
+  const vehicle = await AppDataSource.getRepository(Vehicle).findOne({
+    where: { plateNo: plateNorm },
+    relations: { driver: { user: true } },
+  });
+
+  if (!vehicle) return null;
+
+  return {
+    id: vehicle.id,
+    plateNo: vehicle.plateNo,
+    type: vehicle.type,
+    model: vehicle.model ?? null,
+    color: vehicle.color ?? null,
+    year: vehicle.year ?? null,
+    insuranceExpiry: vehicle.insuranceExpiry ?? null,
+    ownershipVerified: vehicle.ownershipVerified,
+    createdAt: vehicle.createdAt,
+    updatedAt: vehicle.updatedAt,
+    driver: vehicle.driver
+      ? {
+          id: vehicle.driver.id,
+          licenseNo: vehicle.driver.licenseNo,
+          currentPoints: vehicle.driver.currentPoints,
+          licenseStatus: vehicle.driver.licenseStatus,
+          suspendedUntil: vehicle.driver.suspendedUntil ?? null,
+          user: vehicle.driver.user
+            ? {
+                id: vehicle.driver.user.id,
+                name: vehicle.driver.user.name,
+                email: vehicle.driver.user.email,
+                phone: vehicle.driver.user.phone ?? null,
+                nic: vehicle.driver.user.nic ?? null,
+              }
+            : null,
+        }
+      : null,
+  };
 }

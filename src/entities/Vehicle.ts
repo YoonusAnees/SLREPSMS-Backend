@@ -15,13 +15,12 @@ export class Vehicle {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  // store normalized plate (UPPERCASE/TRIM, remove spaces/dashes)
   @Index({ unique: true })
   @Column({ name: "plate_no", type: "varchar", length: 20 })
   plateNo!: string;
 
   @Column({ type: "varchar", length: 50 })
-  type!: string; // Car, Bike, Bus, etc.
+  type!: string;
 
   @Column({ type: "varchar", length: 50, nullable: true })
   model?: string | null;
@@ -33,9 +32,8 @@ export class Vehicle {
   year?: number | null;
 
   @Column({ name: "insurance_expiry", type: "date", nullable: true })
-  insuranceExpiry?: string | null; // YYYY-MM-DD
+  insuranceExpiry?: string | null;
 
-  // ownership verification (simple v1)
   @Column({ name: "ownership_verified", type: "boolean", default: false })
   ownershipVerified!: boolean;
 

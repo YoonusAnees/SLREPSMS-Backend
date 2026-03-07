@@ -12,9 +12,28 @@ import {
 import { User } from "./User.js";
 import type { Dispatch } from "./Dispatch.js";
 
-export type IncidentStatus = "NEW" | "DISPATCHED" | "RESOLVED" | "CANCELLED";
-export type IncidentType = "ACCIDENT" | "BREAKDOWN" | "MEDICAL" | "FIRE" | "OTHER";
+export type IncidentStatus =
+  | "NEW"
+  | "DISPATCHED"
+  | "RESOLVED"
+  | "CANCELLED"
+  | "UNDER_REVIEW";
+
+export type IncidentType =
+  | "ACCIDENT"
+  | "BREAKDOWN"
+  | "MEDICAL"
+  | "FIRE"
+  | "OTHER";
+
 export type IncidentSeverity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+
+export type PenaltySuggestionStatus =
+  | "NONE"
+  | "SUGGESTED"
+  | "AUTO_ISSUED"
+  | "APPROVED"
+  | "REJECTED";
 
 @Entity("incidents")
 export class Incident {
@@ -44,19 +63,43 @@ export class Incident {
     spatialFeatureType: "Point",
     srid: 4326,
   })
-baseLocation!: { type: "Point"; coordinates: [number, number] };
+  baseLocation!: { type: "Point"; coordinates: [number, number] };
+
   @Column({ name: "location_text", type: "varchar", length: 200, nullable: true })
   locationText?: string | null;
 
-@Column({ name: "evidence", type: "varchar", length: 500, nullable: true })
-evidence?: string | null;
+  @Column({ name: "evidence", type: "varchar", length: 500, nullable: true })
+  evidence?: string | null;
 
+  @Column({ name: "plate_no", type: "varchar", length: 20, nullable: true })
+  plateNo?: string | null;
 
+  @Column({
+    name: "suspected_violation_code",
+    type: "varchar",
+    length: 50,
+    nullable: true,
+  })
+  suspectedViolationCode?: string | null;
+
+  @Column({
+    name: "requires_officer_review",
+    type: "boolean",
+    default: false,
+  })
+  requiresOfficerReview!: boolean;
+
+  @Column({
+    name: "penalty_suggestion_status",
+    type: "varchar",
+    length: 20,
+    default: "NONE",
+  })
+  penaltySuggestionStatus!: PenaltySuggestionStatus;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
-  // ✅ string relation target avoids importing Dispatch runtime
   @OneToMany("Dispatch", "incident")
   dispatches!: Dispatch[];
 }

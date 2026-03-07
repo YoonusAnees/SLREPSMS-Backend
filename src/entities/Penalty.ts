@@ -14,7 +14,6 @@ export class Penalty {
   @JoinColumn({ name: "vehicle_id" })
   vehicle!: Vehicle;
 
-  // keep driverUser for history/audit (optional but recommended)
   @ManyToOne(() => User, { onDelete: "RESTRICT" })
   @JoinColumn({ name: "driver_user_id" })
   driverUser!: User;

@@ -1,14 +1,11 @@
 import { Router } from "express";
 import { auth } from "../middleware/auth.js";
 import { rbac } from "../middleware/rbac.js";
-import { create, list } from "../controllers/incident.controller.js";
+import { create, list ,my} from "../controllers/incident.controller.js";
 import { upload } from "../middleware/upload.js";
 
 const r = Router();
 
-/* ------------------------------
-   UPLOAD EVIDENCE (Frontend uses this)
---------------------------------*/
 r.post(
   "/upload",
   auth,
@@ -20,25 +17,12 @@ r.post(
     }
 
     const fullUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-
     res.json({ url: fullUrl });
   }
 );
 
-
-/* ------------------------------
-   CREATE INCIDENT
---------------------------------*/
-r.post(
-  "/",
-  auth,
-  rbac(["DRIVER", "OFFICER", "ADMIN"]),
-  create
-);
-
-/* ------------------------------
-   LIST INCIDENTS
---------------------------------*/
+r.post("/", auth, rbac(["DRIVER", "OFFICER", "ADMIN"]), create);
 r.get("/", auth, rbac(["OFFICER", "ADMIN", "DISPATCHER"]), list);
+r.get("/my", auth, rbac(["DRIVER" ,"OFFICER"]), my);
 
 export default r;

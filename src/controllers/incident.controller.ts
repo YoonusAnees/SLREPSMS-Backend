@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { createIncident, listIncidents } from "../services/incident.service.js";
+import { createIncident, listIncidents ,listMyIncidents} from "../services/incident.service.js";
 
 export async function create(req: Request, res: Response) {
   const userId = (req as any).user.sub;
@@ -13,7 +13,8 @@ export async function create(req: Request, res: Response) {
     description: z.string().optional(),
     locationText: z.string().optional(),
     evidence: z.string().optional(),
-    baseLocation: z.object({ lat: z.number(), lng: z.number() }).optional(),
+    plateNo: z.string().min(4).max(20).optional(),
+    suspectedViolationCode: z.string().min(3).max(50).optional(),
   }).parse(req.body);
 
   res.json(await createIncident(userId, dto));
@@ -21,4 +22,9 @@ export async function create(req: Request, res: Response) {
 
 export async function list(req: Request, res: Response) {
   res.json(await listIncidents());
+}
+
+export async function my(req: Request, res: Response) {
+  const userId = (req as any).user.sub;
+  res.json(await listMyIncidents(userId));
 }
