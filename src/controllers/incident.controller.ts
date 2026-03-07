@@ -1,6 +1,12 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { createIncident, listIncidents ,listMyIncidents} from "../services/incident.service.js";
+import {
+  createIncident,
+  listIncidents,
+  listMyIncidents,
+  reviewIncident,
+  resolveIncident,
+} from "../services/incident.service.js";
 
 export async function create(req: Request, res: Response) {
   const userId = (req as any).user.sub;
@@ -27,4 +33,16 @@ export async function list(req: Request, res: Response) {
 export async function my(req: Request, res: Response) {
   const userId = (req as any).user.sub;
   res.json(await listMyIncidents(userId));
+}
+
+export async function review(req: Request, res: Response) {
+  const officerUserId = (req as any).user.sub;
+  const incidentId = z.string().uuid().parse(req.params.id);
+  res.json(await reviewIncident(officerUserId, incidentId));
+}
+
+export async function resolve(req: Request, res: Response) {
+  const officerUserId = (req as any).user.sub;
+  const incidentId = z.string().uuid().parse(req.params.id);
+  res.json(await resolveIncident(officerUserId, incidentId));
 }

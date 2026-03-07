@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Driver } from "./Driver.js";
+import { User } from "./User.js";
 
 @Entity("vehicles")
 export class Vehicle {
@@ -36,6 +37,13 @@ export class Vehicle {
 
   @Column({ name: "ownership_verified", type: "boolean", default: false })
   ownershipVerified!: boolean;
+
+  @ManyToOne(() => User, { nullable: true, onDelete: "SET NULL" })
+  @JoinColumn({ name: "verified_by_user_id" })
+  verifiedBy?: User | null;
+
+  @Column({ name: "verified_at", type: "timestamptz", nullable: true })
+  verifiedAt?: Date | null;
 
   @ManyToOne(() => Driver, { onDelete: "CASCADE" })
   @JoinColumn({ name: "driver_id" })

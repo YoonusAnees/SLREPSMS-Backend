@@ -82,6 +82,10 @@ export async function createIncident(
         : detectedViolation
           ? "SUGGESTED"
           : "NONE",
+      reviewedBy: null,
+      reviewedAt: null,
+      resolvedBy: null,
+      resolvedAt: null,
     });
 
     const savedIncident = await iRepo.save(incident);
@@ -199,6 +203,8 @@ export async function listIncidents() {
     .createQueryBuilder("i")
     .leftJoinAndSelect("i.reportedBy", "reportedBy")
     .leftJoinAndSelect("i.dispatches", "dispatches")
+    .leftJoinAndSelect("i.reviewedBy", "reviewedBy")
+    .leftJoinAndSelect("i.resolvedBy", "resolvedBy")
     .addSelect(`ST_AsGeoJSON(i.location)`, "location_geojson")
     .orderBy("i.createdAt", "DESC")
     .getRawAndEntities();
@@ -222,6 +228,8 @@ export async function listMyIncidents(userId: string) {
     .createQueryBuilder("i")
     .leftJoinAndSelect("i.reportedBy", "reportedBy")
     .leftJoinAndSelect("i.dispatches", "dispatches")
+    .leftJoinAndSelect("i.reviewedBy", "reviewedBy")
+    .leftJoinAndSelect("i.resolvedBy", "resolvedBy")
     .where("reportedBy.id = :userId", { userId })
     .addSelect(`ST_AsGeoJSON(i.location)`, "location_geojson")
     .orderBy("i.createdAt", "DESC")
@@ -236,5 +244,67 @@ export async function listMyIncidents(userId: string) {
       ...e,
       location: e.locationText || geo || null,
     };
+  });
+}
+
+export async function reviewIncident(officerUserId: string, incidentId: string) {
+  return AppDataSource.transaction(async (trx) => {
+    const uRepo = trx.getRepository(User);
+    const iRepo = trx.getRepository(Incident);
+
+    const officer = await uRepo.findOne({ where: { id: officerUserId } });
+    if (!officer || officer.role !== "OFFICER") {
+      throw Object.assign(new Error("Only OFFICER can review incidents"), { status: 403 });
+    }
+
+    const incident = await iRepo.findOne({
+      where: { id: incidentId },
+      relations: { reviewedBy: true, resolvedBy: true },
+    });
+
+    if (!incident) {
+      throw Object.assign(new Error("Incident not found"), { status: 404 });
+    }
+
+    incident.reviewedBy = officer;
+    incident.reviewedAt = new Date();
+
+    if (incident.status === "NEW") {
+      incident.status = "UNDER_REVIEW";
+    }
+
+    return iRepo.save(incident);
+  });
+}
+
+export async function resolveIncident(officerUserId: string, incidentId: string) {
+  return AppDataSource.transaction(async (trx) => {
+    const uRepo = trx.getRepository(User);
+    const iRepo = trx.getRepository(Incident);
+
+    const officer = await uRepo.findOne({ where: { id: officerUserId } });
+    if (!officer || officer.role !== "OFFICER") {
+      throw Object.assign(new Error("Only OFFICER can resolve incidents"), { status: 403 });
+    }
+
+    const incident = await iRepo.findOne({
+      where: { id: incidentId },
+      relations: { reviewedBy: true, resolvedBy: true },
+    });
+
+    if (!incident) {
+      throw Object.assign(new Error("Incident not found"), { status: 404 });
+    }
+
+    incident.status = "RESOLVED";
+    incident.resolvedBy = officer;
+    incident.resolvedAt = new Date();
+
+    if (!incident.reviewedBy) {
+      incident.reviewedBy = officer;
+      incident.reviewedAt = new Date();
+    }
+
+    return iRepo.save(incident);
   });
 }

@@ -44,6 +44,8 @@ export async function addVehicle(
       year: dto.year ?? null,
       insuranceExpiry: dto.insuranceExpiry ?? null,
       ownershipVerified: false,
+      verifiedBy: null,
+      verifiedAt: null,
       driver,
     });
 
@@ -56,6 +58,7 @@ export async function listMyVehicles(userId: string) {
     .createQueryBuilder("v")
     .leftJoinAndSelect("v.driver", "d")
     .leftJoinAndSelect("d.user", "u")
+    .leftJoinAndSelect("v.verifiedBy", "verifiedBy")
     .where("u.id = :id", { id: userId })
     .orderBy("v.created_at", "DESC")
     .getMany();
@@ -79,16 +82,21 @@ export async function verifyVehicleOwnership(
 
     const vehicle = await vRepo.findOne({
       where: { plateNo: plateNorm },
-      relations: { driver: { user: true } },
+      relations: { driver: { user: true }, verifiedBy: true },
     });
 
     if (!vehicle) {
       throw Object.assign(new Error("Vehicle not found"), { status: 404 });
     }
 
-    if (vehicle.ownershipVerified) return vehicle;
+    if (vehicle.ownershipVerified) {
+      return vehicle;
+    }
 
     vehicle.ownershipVerified = true;
+    vehicle.verifiedBy = verifier;
+    vehicle.verifiedAt = new Date();
+
     return vRepo.save(vehicle);
   });
 }
@@ -98,7 +106,7 @@ export async function getVehicleByPlateNo(plateNo: string) {
 
   const vehicle = await AppDataSource.getRepository(Vehicle).findOne({
     where: { plateNo: plateNorm },
-    relations: { driver: { user: true } },
+    relations: { driver: { user: true }, verifiedBy: true },
   });
 
   if (!vehicle) return null;
@@ -112,6 +120,15 @@ export async function getVehicleByPlateNo(plateNo: string) {
     year: vehicle.year ?? null,
     insuranceExpiry: vehicle.insuranceExpiry ?? null,
     ownershipVerified: vehicle.ownershipVerified,
+    verifiedAt: vehicle.verifiedAt ?? null,
+    verifiedBy: vehicle.verifiedBy
+      ? {
+          id: vehicle.verifiedBy.id,
+          name: vehicle.verifiedBy.name,
+          email: vehicle.verifiedBy.email,
+          role: vehicle.verifiedBy.role,
+        }
+      : null,
     createdAt: vehicle.createdAt,
     updatedAt: vehicle.updatedAt,
     driver: vehicle.driver

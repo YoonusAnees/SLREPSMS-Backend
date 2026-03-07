@@ -9,6 +9,8 @@ import dispatcherRoutes from "./dispatcher.routes.js";
 import incidentsRoutes from "./incident.routes.js";
 import rescueRoutes from "./rescue.routes.js";
 import adminRoutes from "./admin.routes.js";
+import officerRoutes from "./officer.routes.js";
+
 
 
 export const routes = Router();
@@ -23,4 +25,5 @@ routes.use("/incidents", incidentsRoutes);
 routes.use("/dispatch", dispatcherRoutes);
 routes.use("/rescue", rescueRoutes);
 routes.use("/admin", adminRoutes);
+routes.use("/officer", officerRoutes);
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { auth } from "../middleware/auth.js";
 import { rbac } from "../middleware/rbac.js";
-import { create, list ,my} from "../controllers/incident.controller.js";
+import { create, list, my, review, resolve } from "../controllers/incident.controller.js";
 import { upload } from "../middleware/upload.js";
 
 const r = Router();
@@ -22,7 +22,9 @@ r.post(
 );
 
 r.post("/", auth, rbac(["DRIVER", "OFFICER", "ADMIN"]), create);
+r.get("/my", auth, rbac(["DRIVER", "OFFICER"]), my);
 r.get("/", auth, rbac(["OFFICER", "ADMIN", "DISPATCHER"]), list);
-r.get("/my", auth, rbac(["DRIVER" ,"OFFICER"]), my);
+r.patch("/:id/review", auth, rbac(["OFFICER"]), review);
+r.patch("/:id/resolve", auth, rbac(["OFFICER"]), resolve);
 
 export default r;

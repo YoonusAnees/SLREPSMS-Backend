@@ -14,10 +14,10 @@ import type { Dispatch } from "./Dispatch.js";
 
 export type IncidentStatus =
   | "NEW"
+  | "UNDER_REVIEW"
   | "DISPATCHED"
   | "RESOLVED"
-  | "CANCELLED"
-  | "UNDER_REVIEW";
+  | "CANCELLED";
 
 export type IncidentType =
   | "ACCIDENT"
@@ -96,6 +96,20 @@ export class Incident {
     default: "NONE",
   })
   penaltySuggestionStatus!: PenaltySuggestionStatus;
+
+  @ManyToOne(() => User, { nullable: true, onDelete: "SET NULL" })
+  @JoinColumn({ name: "reviewed_by_user_id" })
+  reviewedBy?: User | null;
+
+  @Column({ name: "reviewed_at", type: "timestamptz", nullable: true })
+  reviewedAt?: Date | null;
+
+  @ManyToOne(() => User, { nullable: true, onDelete: "SET NULL" })
+  @JoinColumn({ name: "resolved_by_user_id" })
+  resolvedBy?: User | null;
+
+  @Column({ name: "resolved_at", type: "timestamptz", nullable: true })
+  resolvedAt?: Date | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
