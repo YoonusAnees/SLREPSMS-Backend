@@ -7,7 +7,11 @@ import { errorHandler } from "./middleware/error.js";
 
 export const app = express();
 
-app.use(pinoHttp());
+app.use(
+  pinoHttp({
+    enabled: process.env.NODE_ENV !== "test",
+  })
+);
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }, 

@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 import { z } from "zod";
-dotenv.config();
-
+dotenv.config({ quiet: true });
 const envSchema = z.object({
   PORT: z.string().transform(Number),
   DB_HOST: z.string(),

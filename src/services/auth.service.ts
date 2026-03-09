@@ -113,23 +113,18 @@ export async function login(email: string, password: string) {
 export async function logoutUser(refreshToken: string) {
   const rtRepo = AppDataSource.getRepository(RefreshToken);
 
-  // Find the active refresh token
-  const record = await rtRepo.findOne({
+  const activeTokens = await rtRepo.find({
     where: { revokedAt: IsNull() },
   });
 
-  if (!record) {
-    // Already revoked or invalid token, you can ignore or throw error
-    return;
+  for (const record of activeTokens) {
+    const ok = await bcrypt.compare(refreshToken, record.tokenHash);
+    if (ok) {
+      record.revokedAt = new Date();
+      await rtRepo.save(record);
+      return;
+    }
   }
-
-  // Check if the provided token matches
-  const ok = await bcrypt.compare(refreshToken, record.tokenHash);
-  if (!ok) return; // token doesn't match, do nothing
-
-  // Revoke it
-  record.revokedAt = new Date();
-  await rtRepo.save(record);
 }
 
 export async function refresh(refreshToken: string) {
