@@ -9,7 +9,7 @@ import {
 } from "../services/incident.service.js";
 
 export async function create(req: Request, res: Response) {
-  const userId = (req as any).user.sub;
+  const userId = (req as any).user?.sub ?? null;
 
   const dto = z.object({
     type: z.enum(["ACCIDENT", "BREAKDOWN", "MEDICAL", "FIRE", "OTHER"]),

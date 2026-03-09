@@ -8,8 +8,6 @@ const r = Router();
 
 r.post(
   "/upload",
-  auth,
-  rbac(["DRIVER", "OFFICER", "ADMIN"]),
   upload.single("file"),
   (req, res) => {
     if (!req.file) {
@@ -21,9 +19,9 @@ r.post(
   }
 );
 
-r.post("/", auth, rbac(["DRIVER", "OFFICER", "ADMIN"]), create);
+r.post("/",  create);
 r.get("/my", auth, rbac(["DRIVER", "OFFICER"]), my);
-r.get("/", auth, rbac(["OFFICER", "ADMIN", "DISPATCHER"]), list);
+r.get("/", list);
 r.patch("/:id/review", auth, rbac(["OFFICER"]), review);
 r.patch("/:id/resolve", auth, rbac(["OFFICER"]), resolve);
 

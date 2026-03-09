@@ -66,7 +66,7 @@ export async function createIncident(
       !!matchedVehicle.driver.user;
 
     const incident = iRepo.create({
-      reportedBy: user,
+      reportedBy: user || "Public",
       type: dto.type,
       severity: dto.severity,
       status: canAutoIssuePenalty ? "NEW" : "UNDER_REVIEW",
