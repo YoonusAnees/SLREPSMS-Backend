@@ -12,7 +12,7 @@ const r = Router();
 
 r.post("/add", auth, rbac(["DRIVER"]), createVehicle);
 r.get("/my", auth, rbac(["DRIVER"]), myVehicles);
-r.get("/by-plate/:plateNo", auth, rbac(["DRIVER", "OFFICER", "ADMIN"]), getByPlateNo);
+r.get("/by-plate/:plateNo", getByPlateNo);
 r.post("/verify/:plateNo", auth, rbac(["ADMIN", "OFFICER"]), verifyVehicle);
 
 export default r;
