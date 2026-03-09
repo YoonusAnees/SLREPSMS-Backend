@@ -3,8 +3,9 @@ import { User } from "./User.js";
 
 export enum LicenseStatus {
   ACTIVE = "ACTIVE",
-  SUSPENDED = "SUSPENDED"
+  SUSPENDED = "SUSPENDED",
 }
+
 @Entity("drivers")
 export class Driver {
   @PrimaryGeneratedColumn("uuid")
@@ -15,18 +16,32 @@ export class Driver {
   user!: User;
 
   @Index({ unique: true })
-  @Column({ name: "license_no", length: 30 ,  type: "varchar",
-})
-  licenseNo!: string;
-  @Column({ name: "current_points", type: "int", default: 5 })
-  currentPoints!: number;
   @Column({
-  type: "enum",
-  enum: LicenseStatus,
-  default: LicenseStatus.ACTIVE
-})
-licenseStatus!: LicenseStatus;
+    name: "license_no",
+    type: "varchar",
+    length: 30,
+  })
+  licenseNo!: string;
 
-  @Column({ name: "suspended_until", type: "timestamptz", nullable: true })
+  @Column({
+    name: "current_points",
+    type: "int",
+    default: 5,
+  })
+  currentPoints!: number;
+
+  @Column({
+    name: "license_status",
+    type: "enum",
+    enum: LicenseStatus,
+    default: LicenseStatus.ACTIVE,
+  })
+  licenseStatus!: LicenseStatus;
+
+  @Column({
+    name: "suspended_until",
+    type: "timestamptz",
+    nullable: true,
+  })
   suspendedUntil?: Date | null;
 }

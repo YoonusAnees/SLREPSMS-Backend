@@ -10,6 +10,7 @@ import incidentsRoutes from "./incident.routes.js";
 import rescueRoutes from "./rescue.routes.js";
 import adminRoutes from "./admin.routes.js";
 import officerRoutes from "./officer.routes.js";
+import publicRoutes from "./public.routes.js"
 
 
 
@@ -26,4 +27,5 @@ routes.use("/dispatch", dispatcherRoutes);
 routes.use("/rescue", rescueRoutes);
 routes.use("/admin", adminRoutes);
 routes.use("/officer", officerRoutes);
+routes.use("/public",publicRoutes)
 

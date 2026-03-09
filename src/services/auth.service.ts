@@ -103,7 +103,9 @@ export async function login(email: string, password: string) {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      phone:user.phone,
+      nic:user.nic
     }
   };
 }
