@@ -14,18 +14,25 @@ import { Dispatch } from "../entities/Dispatch.js";
 
 const AppDataSource = new DataSource({
   type: "postgres",
-  host: env.DB_HOST,
-  port: env.DB_PORT,
-  username: env.DB_USER,
-  password: env.DB_PASS,
-  database: env.DB_NAME,
-  entities: [User, RefreshToken ,Driver, ViolationType, Penalty,Vehicle,Payment,Incident,RescueTeam,Dispatch],
-  migrations: ["src/db/migrations/*.ts"],
-  synchronize: false,
-  logging: false,
+  url: env.DB_URL,
   ssl: {
-    rejectUnauthorized: false, // If you need to skip verification of the server's certificate
+    rejectUnauthorized: false,
   },
+  entities: [
+    User,
+    RefreshToken,
+    Driver,
+    ViolationType,
+    Penalty,
+    Vehicle,
+    Payment,
+    Incident,
+    RescueTeam,
+    Dispatch,
+  ],
+  migrations: ["dist/db/migrations/*.js"],
+  synchronize: false,
+  logging: true,
 });
 
 export default AppDataSource;
