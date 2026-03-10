@@ -9,7 +9,7 @@ async function bootstrap() {
     await AppDataSource.initialize();
     console.log("✅ DB connected");
 
-    app.listen( () => {
+    app.listen(env.PORT, () => {
       console.log(`✅ API running on ${env.PORT} `);
     });
   } catch (error) {
