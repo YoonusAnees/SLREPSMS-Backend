@@ -1,18 +1,23 @@
 import "reflect-metadata";
 import { app } from "./app.js";
+import AppDataSource from "./config/data-source.js";
 import { env } from "./config/env.js";
-import AppDataSource from "./config/data-source.js"; // default import
+
+const PORT = env.PORT || 10000;
+const HOST = "0.0.0.0";
 
 async function bootstrap() {
-  await AppDataSource.initialize();
-  console.log("✅ DB connected");
+  try {
+    await AppDataSource.initialize();
+    console.log("✅ DB connected");
 
-  app.listen(env.PORT,"0.0.0.0", () =>
-    console.log(`✅ API running http://localhost:${env.PORT}`)
-  );
+    app.listen(PORT, HOST, () => {
+      console.log(`✅ API running on http://${HOST}:${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Startup failed:", error);
+    process.exit(1);
+  }
 }
 
-bootstrap().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+bootstrap();
