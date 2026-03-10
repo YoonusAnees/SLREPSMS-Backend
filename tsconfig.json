@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "./src",
     "outDir": "./dist",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -16,9 +16,8 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "verbatimModuleSyntax": false,
-    "skipLibCheck": true,
-    "isolatedModules": true
+    "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "tests/setup.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "tests"]
 }

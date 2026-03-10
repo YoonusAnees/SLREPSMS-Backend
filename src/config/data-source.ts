@@ -23,6 +23,9 @@ const AppDataSource = new DataSource({
   migrations: ["src/db/migrations/*.ts"],
   synchronize: false,
   logging: false,
+  ssl: {
+    rejectUnauthorized: false, // If you need to skip verification of the server's certificate
+  },
 });
 
 export default AppDataSource;
