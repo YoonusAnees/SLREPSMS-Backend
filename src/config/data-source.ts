@@ -32,7 +32,7 @@ const AppDataSource = new DataSource({
   ],
   migrations: ["dist/db/migrations/*.js"],
   synchronize: false,
-  logging: true,
+  logging: false,
 });
 
 export default AppDataSource;
