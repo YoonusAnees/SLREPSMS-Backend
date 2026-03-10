@@ -3,16 +3,14 @@ import { app } from "./app.js";
 import AppDataSource from "./config/data-source.js";
 import { env } from "./config/env.js";
 
-const PORT = env.PORT || 10000;
-const HOST = "0.0.0.0";
 
 async function bootstrap() {
   try {
     await AppDataSource.initialize();
     console.log("✅ DB connected");
 
-    app.listen(PORT, HOST, () => {
-      console.log(`✅ API running on http://${HOST}:${PORT}`);
+    app.listen( () => {
+      console.log(`✅ API running on `);
     });
   } catch (error) {
     console.error("❌ Startup failed:", error);
