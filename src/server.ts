@@ -10,7 +10,7 @@ async function bootstrap() {
     console.log("✅ DB connected");
 
     app.listen( () => {
-      console.log(`✅ API running on `);
+      console.log(`✅ API running on ${env.PORT} `);
     });
   } catch (error) {
     console.error("❌ Startup failed:", error);
