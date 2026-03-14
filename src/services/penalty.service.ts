@@ -5,6 +5,8 @@ import { Driver, LicenseStatus } from "../entities/Driver.js";
 import { ViolationType } from "../entities/ViolationType.js";
 import { normalizePlate } from "../utils/normalizePlate.js";
 import { Vehicle } from "../entities/Vehicle.js";
+import { sendEmail } from "../utils/email.js";
+import { penaltyIssuedTemplate } from "../utils/penaltyEmailTemplate.js";
 
 function addOneMonth(date: Date) {
   const d = new Date(date);
@@ -23,7 +25,7 @@ export async function issuePenalty(
     notes?: string;
   }
 ) {
-  return AppDataSource.transaction(async (trx) => {
+  const result = await AppDataSource.transaction(async (trx) => {
     const uRepo = trx.getRepository(User);
     const dRepo = trx.getRepository(Driver);
     const vtRepo = trx.getRepository(ViolationType);
@@ -57,6 +59,7 @@ export async function issuePenalty(
 
     let vehicle: Vehicle | null = null;
 
+    // Vehicle is OPTIONAL
     if (dto.plateNo && dto.plateNo.trim().length > 0) {
       const plateNorm = normalizePlate(dto.plateNo);
 
@@ -107,7 +110,6 @@ export async function issuePenalty(
       driverUser,
       issuedBy: officer,
       violationType: vt,
-      vehicle: vehicle as Vehicle,
       status: "UNPAID",
       fineLkr: vt.baseFineLkr,
       demeritPoints: vt.demeritPoints,
@@ -132,8 +134,39 @@ export async function issuePenalty(
     }
 
     await dRepo.save(driver);
-    return saved;
+
+    return {
+      saved,
+      emailTo: driverUser.email ?? null,
+      emailHtml: driverUser.email
+        ? penaltyIssuedTemplate({
+            driverName: driverUser.name,
+            licenseNo: driver.licenseNo,
+            plateNo: vehicle?.plateNo ?? null,
+            violationCode: vt.code,
+            fine: vt.baseFineLkr,
+            points: vt.demeritPoints,
+            location: dto.locationText,
+            occurredAt: dto.occurredAt,
+          })
+        : null,
+    };
   });
+
+  // send email AFTER transaction succeeds
+  if (result.emailTo && result.emailHtml) {
+    try {
+      await sendEmail({
+        to: result.emailTo,
+        subject: "Traffic Penalty Issued - SLREPMS",
+        html: result.emailHtml,
+      });
+    } catch (err) {
+      console.error("Penalty email sending failed:", err);
+    }
+  }
+
+  return result.saved;
 }
 
 export async function listMyPenalties(driverUserId: string) {
