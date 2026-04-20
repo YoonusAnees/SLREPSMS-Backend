@@ -1,11 +1,13 @@
 import Stripe from "stripe";
 import { env } from "../config/env.js";
 
-const secretKey = env.STRIPE_SECRET_KEY.trim();
+const rawSecretKey = env.STRIPE_SECRET_KEY;
 
-if (!secretKey) {
+if (!rawSecretKey) {
   throw new Error("Missing STRIPE_SECRET_KEY");
 }
+
+const secretKey = rawSecretKey.trim();
 
 console.log("STRIPE KEY DEBUG:", {
   exists: !!secretKey,
