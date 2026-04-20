@@ -1,18 +1,13 @@
 import Stripe from "stripe";
 import { env } from "../config/env.js";
 
-const secretKey = env.STRIPE_SECRET_KEY.trim();
+const rawSecretKey = env.STRIPE_SECRET_KEY;
 
-if (!secretKey) {
+if (!rawSecretKey) {
   throw new Error("Missing STRIPE_SECRET_KEY");
 }
 
-console.log("STRIPE KEY DEBUG:", {
-  exists: !!secretKey,
-  prefix: secretKey.slice(0, 8),
-  suffix: secretKey.slice(-4),
-  length: secretKey.length,
-});
+const secretKey = rawSecretKey!.trim();
 
 export const stripe = new Stripe(secretKey, {
   apiVersion: "2026-02-25.clover",
